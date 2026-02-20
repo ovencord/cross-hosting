@@ -1,0 +1,28 @@
+# Exclude development and configuration files
+node_modules/
+bun.lock
+tsconfig.json
+.gitignore
+.gitattributes
+.npmignore
+.github/
+.git/
+
+# Exclude source testing/examples if they were to exist
+test/
+examples/
+tests/
+coverage/
+
+# OS and IDE files
+.vscode/
+.idea/
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
