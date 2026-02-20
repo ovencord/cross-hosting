@@ -33,7 +33,7 @@ declare module '@ovencord/builders' {
     export default _default;
     export type SlashCommandBuilder = any;
     export type EmbedBuilder = any;
-    export type ActionRowBuilder<T = any> = any;
+    export type ActionRowBuilder = any;
     export type ButtonBuilder = any;
 }
 
