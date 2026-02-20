@@ -19,7 +19,7 @@ jobs:
         run: bun install
 
       - name: Type Check
-        run: bunx tsc --noEmit
+        run: bunx tsc --project tsconfig.json --noEmit
 
       - name: Lint
         run: bun run lint

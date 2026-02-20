@@ -1,26 +1,20 @@
 {
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules"],
-    "compilerOptions": {
-        "lib": ["ESNext"],
-        "target": "ESNext",
-        "module": "ESNext",
-        "moduleDetection": "force",
-        "moduleResolution": "Bundler",
-        "allowImportingTsExtensions": true,
-        "noEmit": true,
-        "composite": false,
-        "declaration": false,
-        "declarationMap": false,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "skipDefaultLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "allowSyntheticDefaultImports": true,
-        "strict": true,
-        "noUnusedLocals": false,
-        "noFallthroughCasesInSwitch": true,
-        "types": ["bun"]
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ESNext", "DOM", "WebWorker"],
+    "types": ["bun"],
+    "strict": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ovencord/discord.js": ["./src/types/ovencord-discord.d.ts"]
     }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
-
