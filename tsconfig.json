@@ -3,16 +3,24 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ESNext", "DOM", "WebWorker"],
+    "lib": ["ESNext"],
     "types": ["bun"],
     "strict": false,
     "skipLibCheck": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@ovencord/discord.js": ["./src/types/ovencord-discord.d.ts"]
+      "@ovencord/discord.js": ["./src/types/ovencord-stubs.d.ts"],
+      "@ovencord/discord.js/*": ["./src/types/ovencord-stubs.d.ts"],
+      "@ovencord/builders": ["./src/types/ovencord-stubs.d.ts"],
+      "@ovencord/builders/*": ["./src/types/ovencord-stubs.d.ts"],
+      "@ovencord/rest": ["./src/types/ovencord-stubs.d.ts"],
+      "@ovencord/rest/*": ["./src/types/ovencord-stubs.d.ts"],
+      "@ovencord/util": ["./src/types/ovencord-stubs.d.ts"],
+      "@ovencord/util/*": ["./src/types/ovencord-stubs.d.ts"]
     }
   },
   "include": ["src/**/*"],
