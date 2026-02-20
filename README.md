@@ -20,7 +20,7 @@
 
 The ultimate cross-hosting library for Bun, optimized for ultra-low latency (<2ms) and native performance. Built to work seamlessly with `@ovencord/hybrid-sharding`.
 
-# Features:
+## Features:
 
 -   **Native Bun Networking:** Uses `Bun.listen` and `Bun.connect` for maximum performance and minimum overhead.
 -   **Ultra Low Latency:** Designed for inter-VPS communication with <2ms latency targets.
@@ -29,16 +29,24 @@ The ultimate cross-hosting library for Bun, optimized for ultra-low latency (<2m
 -   **Rolling Restarts:** Seamlessly update shard counts and machine configurations without downtime.
 -   **Hybrid-Sharding Integration:** Specifically tailored for `@ovencord/hybrid-sharding`.
 
-### 📦 Bundle Size Comparison: Cross-Hosting
+## 📦 Comparison: `discord-cross-hosting` vs `@ovencord/cross-hosting`
 
-| Package | Size (Unpacked) | Total Files | Dependencies | Install Weight (est.) |
-| :--- | :--- | :--- | :--- | :--- |
-| **discord-cross-hosting** | 153 kB | 48 | `net-ipc`, `lodash`, etc. | ~500 kB |
-| **@ovencord/cross-hosting** | 52.8 kB | 14 | **NONE** (Native Bun) | **~53 kB** |
+| Feature | `discord-cross-hosting` | `@ovencord/cross-hosting` | Result / Advantage |
+| :--- | :--- | :--- | :--- |
+| **Runtime** | Node.js (Legacy) | **Bun (Native)** | Native execution without emulation |
+| **Unpacked Size** | 153 kB | **59 kB** | **~61% lighter** |
+| **Total Files** | 48 | **16** | Streamlined, modern architecture |
+| **TCP Engine** | `node:net` (Emulated) | **`Bun.listen` / `Bun.connect`** | Bypasses Node.js overhead |
+| **Event System** | `node:events` (Sync) | **`AsyncEventEmitter`** | Non-blocking asynchronous handling |
+| **Dependencies** | `net-ipc`, `lodash`, etc. | **ZERO (Native)** | Instant install, 0 vulnerabilities |
+| **Data Handling** | `node:buffer` | **`Uint8Array` (Zero-copy)** | RAM-speed data transfers |
+| **Build Step** | `dist/` (Transpiled) | **Source-Only (.ts)** | **0ms Build Time** - Executes TS directly |
+| **Node.js Imports** | Present in source | **ZERO (Grep Zero)** | Complete independence from legacy Node |
 
-🚀 **Result: ~89% savings on total installation weight and zero external networking dependencies!**
 
-# Installation
+> **Result: ~89% savings on total installation weight and zero external networking dependencies!**
+
+# 📦 Installation
 
 ```cli
 bun add @ovencord/cross-hosting
