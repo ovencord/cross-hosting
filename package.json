@@ -1,6 +1,6 @@
 {
     "name": "@ovencord/cross-hosting",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Massively scalable multi-server orchestration for Discord bots. 100% Bun-native. 0% Node.js bloat. Stop emulating, start scaling.",
     "main": "src/index.ts",
     "type": "module",
