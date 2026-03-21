@@ -1,7 +1,7 @@
 import type { ClusterClient, DjsDiscordClient, evalOptions } from '@ovencord/hybrid-sharding';
 import type { RawMessage } from '../Structures/IPCMessage.ts';
 import { BaseMessage } from '../Structures/IPCMessage.ts';
-import type { CrossHostMessage} from '../types/shared.ts';
+import type { CrossHostMessage } from '../types/shared.ts';
 import { messageType } from '../types/shared.ts';
 
 export class Shard {
@@ -25,11 +25,12 @@ export class Shard {
         if (!script || (typeof script !== 'string' && typeof script !== 'function'))
             throw new Error('Script for BroadcastEvaling must be a valid String or Function!');
 
-        options.script = typeof script === 'function' ? `(${script})(this, ${JSON.stringify(options.context)})` : script;
+        options.script =
+            typeof script === 'function' ? `(${script})(this, ${JSON.stringify(options.context)})` : script;
 
         return this.shard
             .evalOnManager(`this.netipc.broadcastEval(${JSON.stringify(options.script)}, ${JSON.stringify(options)})`)
-            .catch(e => {
+            .catch((e) => {
                 console.error('[BCH Shard Error]', e);
                 return [];
             });

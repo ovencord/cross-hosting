@@ -1,8 +1,9 @@
 // @ts-check
-import { RemoteServerCache } from './RemoteServerCache.ts';
-import { messageType } from '../../types/shared.ts';
+
 import type { Bridge } from '../../Manager/Bridge.ts';
 import type { RawMessage } from '../../Structures/IPCMessage.ts';
+import { messageType } from '../../types/shared.ts';
+import { RemoteServerCache } from './RemoteServerCache.ts';
 export class CacheServer {
     server: Bridge;
     path: { path: string; maxSize: number }[];

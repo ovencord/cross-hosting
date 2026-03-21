@@ -1,6 +1,6 @@
 import { generateNonce } from '@ovencord/hybrid-sharding';
-import type { Client } from '../Manager/Client.ts';
 import type { BridgeClient } from '../Manager/Bridge.ts';
+import type { Client } from '../Manager/Client.ts';
 import { messageType } from '../types/shared.ts';
 
 export interface RawMessage {

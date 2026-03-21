@@ -8,7 +8,9 @@
         "@ovencord/hybrid-sharding": "latest"
     },
     "scripts": {
-        "lint": "eslint src/**",
+        "lint": "biome check .",
+        "lint:fix": "biome check --write .",
+        "format": "biome format --write .",
         "start:bridge": "bun src/test/server.ts",
         "start:cluster": "bun src/test/cluster.ts",
         "test": "bun test"
@@ -31,11 +33,9 @@
     "author": "LuigiColantuono",
     "license": "MIT",
     "devDependencies": {
+        "@biomejs/biome": "2.4.8",
         "@types/bun": "latest",
-        "eslint": "9.39.2",
-        "globals": "^17.2.0",
         "redis": "^5.10.0",
-        "typescript": "~5.9.3",
-        "typescript-eslint": "^8.21.0"
+        "typescript": "~5.9.3"
     }
 }

@@ -1,11 +1,11 @@
+import type { evalOptions } from '@ovencord/hybrid-sharding';
+import { chunkArray, fetchRecommendedShards, shardIdForGuildId } from '@ovencord/hybrid-sharding';
+import type { Socket, SocketListener } from 'bun';
 import { AsyncEventEmitter } from '../Structures/AsyncEventEmitter.ts';
 import type { RawMessage } from '../Structures/IPCMessage.ts';
 import { IPCMessage } from '../Structures/IPCMessage.ts';
-import type { evalOptions} from '@ovencord/hybrid-sharding';
-import { chunkArray, fetchRecommendedShards, shardIdForGuildId } from '@ovencord/hybrid-sharding';
-import type { BridgeEvents, BroadcastEvalOptions} from '../types/shared.ts';
+import type { BridgeEvents, BroadcastEvalOptions } from '../types/shared.ts';
 import { messageType } from '../types/shared.ts';
-import type { Socket, SocketListener } from 'bun';
 
 export interface BridgeSocket extends Socket<unknown> {
     id: string;
@@ -83,7 +83,7 @@ export class Bridge extends AsyncEventEmitter {
 
         this.standAlone = options.standAlone ?? false;
         this.shardsPerCluster = options.shardsPerCluster ?? 1;
-        this.totalShards = options.totalShards === 'auto' ? -1 : options.totalShards ?? -1;
+        this.totalShards = options.totalShards === 'auto' ? -1 : (options.totalShards ?? -1);
         this.totalMachines = options.totalMachines;
         this.token = options.token ? options.token.replace(/^Bot\s*/i, '') : undefined;
         this.shardList = options.shardList ?? [];
@@ -116,8 +116,8 @@ export class Bridge extends AsyncEventEmitter {
                 },
                 error: (socket, error) => {
                     this.emit('error', error);
-                }
-            }
+                },
+            },
         });
 
         this.emit('ready', `tcp://${this.options.host || '0.0.0.0'}:${this.options.port}`);
@@ -169,7 +169,7 @@ export class Bridge extends AsyncEventEmitter {
                 close: (reason?: string) => {
                     if (reason) socket.write(JSON.stringify({ error: reason }));
                     socket.end();
-                }
+                },
             };
 
             this.clients.set(id, client);
@@ -198,7 +198,7 @@ export class Bridge extends AsyncEventEmitter {
     private _handleReady(url: string) {
         this._debug(`[READY] Bridge operational on ${url}`);
         if (!this.standAlone) {
-             Bun.sleep(5000).then(() => this.initializeShardData());
+            Bun.sleep(5000).then(() => this.initializeShardData());
         }
     }
 
@@ -209,7 +209,9 @@ export class Bridge extends AsyncEventEmitter {
 
         if (cachedClient.agent === 'bot' && cachedClient.shardList?.length) {
             if (!this.standAlone) this.shardClusterListQueue.push(cachedClient.shardList);
-            this._debug(`[CM => Disconnected][${id}] New ShardListQueue: ${JSON.stringify(this.shardClusterListQueue)}`);
+            this._debug(
+                `[CM => Disconnected][${id}] New ShardListQueue: ${JSON.stringify(this.shardClusterListQueue)}`,
+            );
         } else {
             this._debug(`[CM => Disconnected][${id}]`);
         }
@@ -226,20 +228,24 @@ export class Bridge extends AsyncEventEmitter {
             client.shardList = message.shardList;
 
             const checkShardListPositionInQueue = this.shardClusterListQueue.findIndex(
-                x => JSON.stringify(x) === JSON.stringify(message.shardList),
+                (x) => JSON.stringify(x) === JSON.stringify(message.shardList),
             );
 
             if (checkShardListPositionInQueue !== -1) {
                 this.shardClusterListQueue.splice(checkShardListPositionInQueue, 1);
-                this._debug(`[SHARDLIST_DATA_CURRENT][${client.id}] Current ShardListQueue: ${JSON.stringify(this.shardClusterListQueue)}`);
+                this._debug(
+                    `[SHARDLIST_DATA_CURRENT][${client.id}] Current ShardListQueue: ${JSON.stringify(this.shardClusterListQueue)}`,
+                );
             }
             return;
         }
 
         // Check if it's a request (needs response)
-        const res = message.nonce ? (data: any) => {
-            return Promise.resolve(client.send({ ...data, nonce: message.nonce }));
-        } : undefined;
+        const res = message.nonce
+            ? (data: any) => {
+                  return Promise.resolve(client.send({ ...data, nonce: message.nonce }));
+              }
+            : undefined;
 
         if (res) {
             this._handleRequest(message, res, client);
@@ -258,15 +264,17 @@ export class Bridge extends AsyncEventEmitter {
         // BroadcastEval
         if (message._type === messageType.CLIENT_BROADCAST_REQUEST) {
             const clients = Array.from(this.clients.values()).filter(
-                message.options?.agent ? (c: any) => message.options.agent.includes(c.agent) : (c: any) => c.agent === 'bot',
+                message.options?.agent
+                    ? (c: any) => message.options.agent.includes(c.agent)
+                    : (c: any) => c.agent === 'bot',
             );
 
             message._type = messageType.SERVER_BROADCAST_REQUEST;
-            const promises = clients.map(c => c.request(message, message.options?.timeout));
-            
+            const promises = clients.map((c) => c.request(message, message.options?.timeout));
+
             Promise.all(promises)
-                .then(e => res(e))
-                .catch(e => res({ error: e.message }));
+                .then((e) => res(e))
+                .catch((e) => res({ error: e.message }));
             return;
         }
 
@@ -279,7 +287,7 @@ export class Bridge extends AsyncEventEmitter {
                 this.shardClusterListQueue.shift();
             } else {
                 this.shardClusterListQueue.sort((a, b) => b.length - a.length);
-                const position = this.shardClusterListQueue.findIndex(x => x.length < message.maxClusters + 1);
+                const position = this.shardClusterListQueue.findIndex((x) => x.length < message.maxClusters + 1);
                 if (position === -1) {
                     return res({ error: 'No Cluster List with less than ' + (message.maxClusters + 1) + ' found!' });
                 } else {
@@ -288,17 +296,24 @@ export class Bridge extends AsyncEventEmitter {
                 }
             }
 
-            this._debug(`[SHARDLIST_DATA_RESPONSE][${client.id}] ShardList: ${JSON.stringify(client.shardList)}`, { cm: true });
+            this._debug(`[SHARDLIST_DATA_RESPONSE][${client.id}] ShardList: ${JSON.stringify(client.shardList)}`, {
+                cm: true,
+            });
 
-            const clusterIds = this.shardClusterList.map(x => x.length);
+            const clusterIds = this.shardClusterList.map((x) => x.length);
             const shardListPosition = this.shardClusterList.findIndex(
-                x => JSON.stringify(x) === JSON.stringify(client.shardList),
+                (x) => JSON.stringify(x) === JSON.stringify(client.shardList),
             );
             const clusterId = clusterIds.splice(0, shardListPosition);
             let r = clusterId.reduce((a, b) => a + b, 0);
             const clusterList = client.shardList.map(() => r++);
-            
-            res({ shardList: client.shardList, totalShards: this.totalShards, clusterList: clusterList, _type: messageType.CUSTOM_REPLY });
+
+            res({
+                shardList: client.shardList,
+                totalShards: this.totalShards,
+                clusterList: clusterList,
+                _type: messageType.CUSTOM_REPLY,
+            });
             return;
         }
 
@@ -306,29 +321,29 @@ export class Bridge extends AsyncEventEmitter {
         if (message._type === messageType.GUILD_DATA_REQUEST) {
             if (!message.guildId) return res({ error: 'Missing guildId for request to Guild' });
             this.requestToGuild(message as any)
-                .then(e => res(e))
-                .catch(e => res({ ...message, error: e.message }));
+                .then((e) => res(e))
+                .catch((e) => res({ ...message, error: e.message }));
             return;
         }
 
         if (message._type === messageType.CLIENT_DATA_REQUEST) {
             if (!message.agent && !message.clientId)
                 return res({ ...message, error: 'AGENT MISSING OR CLIENTID MISSING FOR FINDING TARGET CLIENT' });
-            
+
             if (message.clientId) {
                 const targetClient = this.clients.get(message.clientId);
                 if (!targetClient) return res({ ...message, error: 'CLIENT NOT FOUND WITH PROVIDED CLIENT ID' });
                 return targetClient
                     .request(message, message.options?.timeout)
-                    .then(e => res(e))
-                    .catch(e => res({ ...message, error: e.message }));
+                    .then((e) => res(e))
+                    .catch((e) => res({ ...message, error: e.message }));
             }
 
-            const targets = Array.from(this.clients.values()).filter(c => c.agent === String(message.agent));
-            const promises = targets.map(c => c.request(message, message.options?.timeout));
+            const targets = Array.from(this.clients.values()).filter((c) => c.agent === String(message.agent));
+            const promises = targets.map((c) => c.request(message, message.options?.timeout));
             return Promise.all(promises)
-                .then(e => res(e))
-                .catch(e => res({ ...message, error: e.message }));
+                .then((e) => res(e))
+                .catch((e) => res({ ...message, error: e.message }));
         }
 
         const emitMessage = new IPCMessage(client as any, message, res);
@@ -354,33 +369,36 @@ export class Bridge extends AsyncEventEmitter {
 
         this._debug(`Created shardClusterList: ${JSON.stringify(this.shardClusterList)}`);
 
-        const clients = Array.from(this.clients.values()).filter(c => c.agent === 'bot');
+        const clients = Array.from(this.clients.values()).filter((c) => c.agent === 'bot');
         const updateMessage = {
             totalShards: this.totalShards,
             shardClusterList: this.shardClusterList,
             _type: messageType.SHARDLIST_DATA_UPDATE,
         };
         for (const client of clients) client.send(updateMessage);
-        
+
         return this.shardClusterList;
     }
 
     public async broadcastEval(script: string, options: BroadcastEvalOptions = {}) {
         if (!script || (typeof script !== 'string' && typeof script !== 'function'))
             throw new Error('Script for BroadcastEvaling must be a valid String or Function!');
-        
-        const finalScript = typeof script === 'function' ? `(${script})(this, ${JSON.stringify(options.context)})` : script;
+
+        const finalScript =
+            typeof script === 'function' ? `(${script})(this, ${JSON.stringify(options.context)})` : script;
         const message = { script: finalScript, options, _type: messageType.SERVER_BROADCAST_REQUEST };
-        const targets = Array.from(this.clients.values()).filter(options.filter || (c => c.agent === 'bot'));
-        
-        return Promise.all(targets.map(c => c.request(message, options.timeout)));
+        const targets = Array.from(this.clients.values()).filter(options.filter || ((c) => c.agent === 'bot'));
+
+        return Promise.all(targets.map((c) => c.request(message, options.timeout)));
     }
 
     public async requestToGuild(message: RawMessage & { guildId: string }, options?: evalOptions) {
         if (!message?.guildId) throw new Error('GuildID has not been provided!');
         const internalShard = shardIdForGuildId(message.guildId, this.totalShards);
 
-        const targetClient = Array.from(this.clients.values()).find(x => x?.shardList?.flat()?.includes(internalShard));
+        const targetClient = Array.from(this.clients.values()).find((x) =>
+            x?.shardList?.flat()?.includes(internalShard),
+        );
         if (!targetClient) throw new Error('Internal Shard not found on any connected client!');
 
         message.options = { ...options, ...message.options, shard: internalShard };

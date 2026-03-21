@@ -1,10 +1,10 @@
-import { AsyncEventEmitter } from '../Structures/AsyncEventEmitter.ts';
-import type { ClusterManager, Cluster, evalOptions } from '@ovencord/hybrid-sharding';
-import type { RawMessage } from '../Structures/IPCMessage.ts';
-import { IPCMessage, BaseMessage } from '../Structures/IPCMessage.ts';
-import type { CrossHostMessage, ClientEvents } from '../types/shared.ts';
-import { messageType } from '../types/shared.ts';
+import type { Cluster, ClusterManager, evalOptions } from '@ovencord/hybrid-sharding';
 import type { Socket } from 'bun';
+import { AsyncEventEmitter } from '../Structures/AsyncEventEmitter.ts';
+import type { RawMessage } from '../Structures/IPCMessage.ts';
+import { BaseMessage, IPCMessage } from '../Structures/IPCMessage.ts';
+import type { ClientEvents, CrossHostMessage } from '../types/shared.ts';
+import { messageType } from '../types/shared.ts';
 
 export interface ClientOptions {
     /**
@@ -69,7 +69,7 @@ export class Client extends AsyncEventEmitter {
 
     public async connect(): Promise<void> {
         this._debug(`[Connect] Connecting to Bridge at ${this.options.host || 'localhost'}:${this.options.port}`);
-        
+
         try {
             this.socket = await Bun.connect({
                 hostname: this.options.host || 'localhost',
@@ -79,11 +79,13 @@ export class Client extends AsyncEventEmitter {
                         this.connected = true;
                         this._debug(`[Connect] Connection established`);
                         // Send initial handshake
-                        socket.write(JSON.stringify({
-                            authToken: this.authToken,
-                            agent: this.agent,
-                            _type: messageType.HEARTBEAT
-                        }));
+                        socket.write(
+                            JSON.stringify({
+                                authToken: this.authToken,
+                                agent: this.agent,
+                                _type: messageType.HEARTBEAT,
+                            }),
+                        );
                         this.startHeartbeat();
                         this.emit('ready', { url: `tcp://${this.options.host || 'localhost'}:${this.options.port}` });
                     },
@@ -101,8 +103,8 @@ export class Client extends AsyncEventEmitter {
                     error: (socket, error) => {
                         this.emit('error', error);
                         this._handleDisconnect();
-                    }
-                }
+                    },
+                },
             });
         } catch (e) {
             this._debug(`[Connect Error] ${e}`);
@@ -119,7 +121,7 @@ export class Client extends AsyncEventEmitter {
         this.connected = false;
         this.stopHeartbeat();
         this._debug(`[Disconnect] Connection to Bridge lost. Reconnecting in ${this.reconnectInterval}ms...`);
-        
+
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
         this.reconnectTimer = setTimeout(() => this.connect(), this.reconnectInterval);
         this.emit('close');
@@ -178,9 +180,11 @@ export class Client extends AsyncEventEmitter {
         }
 
         // Check if it's a request from Bridge
-        const res = message.nonce ? (data: any) => {
-            return Promise.resolve(this.send({ ...data, nonce: message.nonce }));
-        } : undefined;
+        const res = message.nonce
+            ? (data: any) => {
+                  return Promise.resolve(this.send({ ...data, nonce: message.nonce }));
+              }
+            : undefined;
 
         if (res) {
             this._handleRequest(message, res);
@@ -198,9 +202,10 @@ export class Client extends AsyncEventEmitter {
 
         // BroadcastEval
         if (message._type === messageType.SERVER_BROADCAST_REQUEST) {
-            this.manager.broadcastEval(message.script, message.options)
-                ?.then(e => res(e))
-                .catch(e => res({ error: e.message || e }));
+            this.manager
+                .broadcastEval(message.script, message.options)
+                ?.then((e) => res(e))
+                .catch((e) => res({ error: e.message || e }));
             return;
         }
 
@@ -214,17 +219,19 @@ export class Client extends AsyncEventEmitter {
 
             if (!findCluster) return res({ error: `Cluster for shard ${message.options.shard} not found!` });
 
-            findCluster.request(message)
-                .then(e => res(e))
-                .catch(e => res({ error: e.message || e }));
+            findCluster
+                .request(message)
+                .then((e) => res(e))
+                .catch((e) => res({ error: e.message || e }));
             return;
         }
 
         // Guild Eval
         if (message._type === messageType.GUILD_EVAL_REQUEST) {
-            this.manager.evalOnCluster(message.script, message.options)
-                ?.then(e => res(e))
-                .catch(e => res({ error: e.message || e }));
+            this.manager
+                .evalOnCluster(message.script, message.options)
+                ?.then((e) => res(e))
+                .catch((e) => res({ error: e.message || e }));
             return;
         }
 
@@ -238,7 +245,7 @@ export class Client extends AsyncEventEmitter {
         this._debug(`Given Shard Data: ${JSON.stringify(response)}`);
         if (!response) throw new Error(`No Response from Bridge`);
         if (response.error) throw new Error(response.error);
-        
+
         this.clusterList = response.clusterList;
         this.shardList = response.shardList;
         this.totalShards = response.totalShards;
@@ -256,8 +263,9 @@ export class Client extends AsyncEventEmitter {
         if (options.script) script = options.script;
         if (!script || (typeof script !== 'string' && typeof script !== 'function'))
             throw new Error('Script for BroadcastEvaling must be a valid String or Function!');
-        
-        const finalScript = typeof script === 'function' ? `(${script})(this, ${JSON.stringify(options.context)})` : script;
+
+        const finalScript =
+            typeof script === 'function' ? `(${script})(this, ${JSON.stringify(options.context)})` : script;
         const message = { script: finalScript, options, _type: messageType.CLIENT_BROADCAST_REQUEST };
         return this.request(message, options.timeout);
     }
@@ -265,21 +273,24 @@ export class Client extends AsyncEventEmitter {
     public send(message: RawMessage, options: CrossHostMessage = {}) {
         if (!this.connected || !this.socket) return;
         if (!message) throw new Error('Message has not been provided!');
-        
+
         if (!options.internal) {
             message = new BaseMessage(message).toJSON();
         }
-        
+
         this.socket.write(JSON.stringify(message));
     }
 
-    public async request(message: RawMessage, options: number | { timeout?: number; internal?: boolean } = 30000): Promise<any> {
-        const timeout = typeof options === 'number' ? options : options.timeout ?? 30000;
+    public async request(
+        message: RawMessage,
+        options: number | { timeout?: number; internal?: boolean } = 30000,
+    ): Promise<any> {
+        const timeout = typeof options === 'number' ? options : (options.timeout ?? 30000);
         if (!this.connected || !this.socket) throw new Error('Client is not connected to Bridge');
-        
+
         const nonce = message.nonce || Math.random().toString(36).substring(2, 15);
         message.nonce = nonce;
-        
+
         return new Promise((resolve, reject) => {
             const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
             const listener = (msg: any) => {
