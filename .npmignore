@@ -7,6 +7,7 @@ tsconfig.json
 .npmignore
 .github/
 .git/
+biome.json
 
 # Exclude source testing/examples if they were to exist
 test/
