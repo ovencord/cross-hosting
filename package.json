@@ -1,6 +1,6 @@
 {
     "name": "@ovencord/cross-hosting",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "Massively scalable multi-server orchestration for Discord bots. 100% Bun-native. 0% Node.js bloat. Stop emulating, start scaling.",
     "main": "src/index.ts",
     "type": "module",
@@ -35,7 +35,7 @@
     "devDependencies": {
         "@biomejs/biome": "2.4.8",
         "@types/bun": "latest",
-        "redis": "^5.10.0",
-        "typescript": "~5.9.3"
+        "redis": "5.11.0",
+        "typescript": "5.9.3"
     }
 }
