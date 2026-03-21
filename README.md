@@ -1,15 +1,14 @@
 # 𝗖 𝗥 𝗢 𝗦 𝗦 - 𝗛 𝗢 𝗦 𝗧 𝗜 𝗡 𝗚
 
 <p align="left">
-<img src="https://img.shields.io/github/sponsors/LuigiColantuono?style=social"></a> 
 <a href="https://paypal.me/l0g4n7">
 <img src="https://img.shields.io/badge/💖-Support-ff69b4"></a> 
 <img src="https://img.shields.io/npm/v/@ovencord/cross-hosting"> 
 <img src="https://img.shields.io/npm/dm/@ovencord/cross-hosting?label=downloads"> 
 <img src="https://img.shields.io/npm/l/@ovencord/cross-hosting"> 
-<img src="https://img.shields.io/github/repo-size/ovencord/cross-hosting"> 
+<img src="https://saizu.dev/badge/ovencord/cross-hosting?type=gzip" alt="gzip size">
+<img src="https://saizu.dev/badge/ovencord/cross-hosting?type=install" alt="install size">
 <a href="https://github.com/ovencord/cross-hosting">
-<img src="https://img.shields.io/badge/Bun-Networking-black?logo=bun"></a>
 </p>
 
 <p align="center">
